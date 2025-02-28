@@ -29,13 +29,25 @@ namespace AutomationInterfaceBasic
         /// </summary>
         private void InitializeComponent()
         {
+            this.btnCreateTwinCATInstance = new System.Windows.Forms.Button();
             this.SuspendLayout();
+            // 
+            // btnCreateTwinCATInstance
+            // 
+            this.btnCreateTwinCATInstance.Location = new System.Drawing.Point(12, 12);
+            this.btnCreateTwinCATInstance.Name = "btnCreateTwinCATInstance";
+            this.btnCreateTwinCATInstance.Size = new System.Drawing.Size(141, 23);
+            this.btnCreateTwinCATInstance.TabIndex = 0;
+            this.btnCreateTwinCATInstance.Text = "Create Instance of XAE Shell";
+            this.btnCreateTwinCATInstance.UseVisualStyleBackColor = true;
+            this.btnCreateTwinCATInstance.Click += new System.EventHandler(this.btnCreateTwinCATInstance_Click);
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnCreateTwinCATInstance);
             this.Name = "Main";
             this.Text = "Main";
             this.ResumeLayout(false);
@@ -43,6 +55,8 @@ namespace AutomationInterfaceBasic
         }
 
         #endregion
+
+        private System.Windows.Forms.Button btnCreateTwinCATInstance;
     }
 }
 
