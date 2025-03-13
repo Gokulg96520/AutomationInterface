@@ -21,25 +21,31 @@ namespace AutomationInterfaceBasic
         private ITcSmTreeItem plc;
         private ITcSmTreeItem newPlcProject;
 
+        private List<Task> runningTasks;
+
         public Main()
         {
             InitializeComponent();
+            runningTasks = new List<Task>();
         }
 
         private async void btnCreateTwinCATInstance_Click(object sender, EventArgs e)
         {
-            await Task.Run(() =>
+            var task = Task.Run(() =>
             {
                 t = System.Type.GetTypeFromProgID("TcXaeShell.DTE.15.0");
                 dte = (EnvDTE.DTE)System.Activator.CreateInstance(t);
                 dte.SuppressUI = false;
                 dte.MainWindow.Visible = true;
             });
+
+            runningTasks.Add(task);
+            await task;
         }
 
         private async void btnCreateTwinCATPrj_Click(object sender, EventArgs e)
         {
-            await Task.Run(() =>
+            var task = Task.Run(() =>
             {
                 sol = dte.Solution;
                 sol.Create(@"C:\Users\GokulG\Desktop\New folder", "SolProj");
@@ -48,11 +54,13 @@ namespace AutomationInterfaceBasic
                 prj = sol.AddFromTemplate(template, @"C:\Users\GokulG\Desktop\New folder\TwinCATPrj", "TwinCATPrj");
                 
             });
+            runningTasks.Add(task);
+            await task;
         }
 
         private async void btnActivateConfig_Click(object sender, EventArgs e)
         {
-            await Task.Run(() =>
+            var task = Task.Run(() =>
             {
                 if (sysManager == null)
                 {
@@ -60,11 +68,13 @@ namespace AutomationInterfaceBasic
                 }
                 sysManager.ActivateConfiguration();
             });
+            runningTasks.Add(task);
+            await task;
         }
 
         private async void btnRestartTwincat_Click(object sender, EventArgs e)
         {
-            await Task.Run(() =>
+            var task = Task.Run(() =>
             {
                 if (sysManager == null)
                 {
@@ -72,11 +82,13 @@ namespace AutomationInterfaceBasic
                 }
                 sysManager.StartRestartTwinCAT();
             });
+            runningTasks.Add(task);
+            await task;
         }
 
         private async void btnCreatePLCProject_Click(object sender, EventArgs e)
         {
-            await Task.Run(() =>
+            var task = Task.Run(() =>
             {
                 if (sysManager == null){
                     sysManager = (ITcSysManager)prj.Object;
@@ -87,8 +99,38 @@ namespace AutomationInterfaceBasic
                 //If you are using beckhoff template just enter the template name path is not Required;
                 newPlcProject = plc.CreateChild("PLCProject1", 0, "", "Standard PLC Template.plcproj"); 
             });
+            runningTasks.Add(task);
+            await task;
         }
 
+        private async void Form1_FormClosing (object sender, FormClosingEventArgs e)
+        {
+            //Prevent Closing Immediately
+            e.Cancel = true;
 
+            //Wait for all running tasks to complete
+            await Task.WhenAll(runningTasks);
+
+            //Ensire DTE Instance is properly closed 
+            if (dte != null)
+            {
+                try
+                {
+                    dte.Quit();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to close DTE instance: {ex.Message}");
+
+                }
+                finally
+                {
+                    dte = null;
+                }
+            }
+
+            // Wait for all running tasks to complete
+            e.Cancel = false;
+        }
     }
 }
